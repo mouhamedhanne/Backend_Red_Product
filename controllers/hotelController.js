@@ -43,7 +43,10 @@ exports.createHotel = async (req, res) => {
         address: req.body.address,
         email: req.body.email,
         telephone: req.body.telephone,
-        pricePerNight: req.body.pricePerNight
+        pricePerNight: req.body.pricePerNight,
+        devise: req.body.devise,
+        imageUrl: req.body.imageUrl
+
     });
 
     try {
