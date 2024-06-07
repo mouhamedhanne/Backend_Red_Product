@@ -1,32 +1,45 @@
-const express = require("express");
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv=require('dotenv');
+
+dotenv.config({path:'./.env'});
+
 const app = express();
-const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
-const hotelRoutes = require("./routes/hotelRoutes");
-require("dotenv").config();
+const port = 3007;
 
-// Connexion à MongoDB
-connectDB();
+const userRoutes = require('./routes/users');
+const hotelRoutes = require('./routes/hotel');
+const authRoutes = require("./routes/authRoutes")
+const { requireAuth } = require('./middleware/authMiddleware');
 
-// Middleware pour parser le JSON
-app.use(express.json());
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
 
-// Configurer CORS
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-);
-
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/hotels", hotelRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Hotel App Backend - API is running");
+// Connexion à la base de données MongoDB
+mongoose.connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('MongoDB connected');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
 });
 
-// Démarrer le serveur
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+//requireAuth
+
+app.use('/api/users',userRoutes);
+app.use('/api/hotels',hotelRoutes);
+
+app.use('/api',authRoutes);
+app.use('/api', requireAuth, (req, res) => {
+    res.status(200).json({ message: 'Protected route accessed' });
+});
+
+
+// Lancer le serveur
+app.listen(port, () => {
+    console.log(`Serveur démarré sur http://localhost:${port}`);
+});
