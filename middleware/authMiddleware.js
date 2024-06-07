@@ -1,29 +1,20 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-exports.protect = (req, res, next) => {
-  const token = req.header("Authorization");
+const requireAuth = (req, res, next) => {
+    const token = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
-  try {
-    const decoded = jwt.verify(
-      token.replace("Bearer ", ""),
-      process.env.JWT_SECRET
-    );
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: "Token is not valid" });
-  }
-};
-
-exports.authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Access denied" });
+    if (token) {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+            if (err) {
+                return res.status(401).json({ message: 'Token invalide ou expiré.' });
+            } else {
+                req.userId = decodedToken.userId;
+                next();
+            }
+        });
+    } else {
+        return res.status(401).json({ message: 'Token manquant.' });
     }
-    next();
-  };
 };
+
+module.exports = { requireAuth };
