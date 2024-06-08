@@ -11,19 +11,6 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-/*const registerUser = async (req, res) => {
-    try {
-        const { fullName, email, password } = await req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = await User.create({ fullName, email, password: hashedPassword });
-
-        res.status(201).json({ message: "User registered", user });
-    } catch (error) {
-        console.error("Error registering user:", error);
-        res.status(500).json({ message: "An error occurred while registering the user." });
-    }
-};*/
 
 
 exports.createUser = async (req, res) => {
@@ -37,18 +24,6 @@ exports.createUser = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 
-    /*const user = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
-    });
-
-    try {
-        const newUser = await user.save();
-        res.status(201).json(newUser);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }*/
 };
 
 exports.getUserById = async (req, res) => {

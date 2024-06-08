@@ -23,20 +23,6 @@ exports.getHotelById = async (req, res) => {
     }
 };
 
-/*exports.createUser = async (req, res) => {
-    const user = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
-    });
-
-    try {
-        const newUser = await user.save();
-        res.status(201).json(newUser);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-};*/
 exports.createHotel = async (req, res) => {
     const hotel = new Hotel({
         name: req.body.name,
@@ -45,7 +31,9 @@ exports.createHotel = async (req, res) => {
         telephone: req.body.telephone,
         pricePerNight: req.body.pricePerNight,
         devise: req.body.devise,
-        imageUrl: req.body.imageUrl
+        imageUrl: req.body.imageUrl,
+
+
 
     });
 
@@ -103,6 +91,20 @@ exports.deleteHotelTwo = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+exports.deleteHotelTwoAll = async (req, res) => {
+    try {
+        const result = await Hotel.deleteMany({});
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Aucun hôtel trouvé' });
+        }
+        res.json({ message: 'Tous les hôtels ont été supprimés avec succès' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+
+};
+
 
 exports.patchHotel = async (req, res) => {
     try {
