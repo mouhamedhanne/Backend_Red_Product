@@ -1,45 +1,56 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const dotenv=require('dotenv');
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
-dotenv.config({path:'./.env'});
+dotenv.config({ path: "./.env" });
 
 const app = express();
 const port = 3007;
 
-const userRoutes = require('./routes/users');
-const hotelRoutes = require('./routes/hotel');
-const authRoutes = require("./routes/authRoutes")
-const { requireAuth } = require('./middleware/authMiddleware');
+const userRoutes = require("./routes/users");
+const hotelRoutes = require("./routes/hotel");
+const authRoutes = require("./routes/authRoutes");
+const { requireAuth } = require("./middleware/authMiddleware");
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
+// Configure CORS
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Changez cette valeur pour correspondre à votre origine front-end
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 // Connexion à la base de données MongoDB
-mongoose.connect(process.env.DATABASE_URL, {
+mongoose
+  .connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('MongoDB connected');
-}).catch(err => {
-    console.error('MongoDB connection error:', err);
-});
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
 
 //requireAuth
 
-app.use('/api/users',userRoutes);
-app.use('/api/hotels',hotelRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/hotels", hotelRoutes);
 
-app.use('/api',authRoutes);
-app.use('/api', requireAuth, (req, res) => {
-    res.status(200).json({ message: 'Protected route accessed' });
+app.use("/api", authRoutes);
+app.use("/api", requireAuth, (req, res) => {
+  res.status(200).json({ message: "Protected route accessed" });
 });
-
 
 // Lancer le serveur
 app.listen(port, () => {
-    console.log(`Serveur démarré sur http://localhost:${port}`);
+  console.log(`Serveur démarré sur http://localhost:${port}`);
 });
